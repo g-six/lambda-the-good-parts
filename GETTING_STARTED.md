@@ -7,4 +7,10 @@ that readers are well-versed in the following:
 - NodeJS
 - AWS CLI
 
+To save us the time, you'll first need to clone the [repository](https://github.com/g-six/lambda-the-good-parts).
+```
+# Then install the node packages
+npm i
+```
+
 ## 2. START
