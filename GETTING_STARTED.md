@@ -88,3 +88,13 @@ outfile.txt && printf "\n\n" >> outfile.txt && cat outfile.txt && rm outfile.txt
 }
 "{}"
 ```
+
+## 4. Setting up the Api Gateway Proxy Resource using Cloudformation
+
+## 5. Test
+
+Get the invocation url via `describe-stacks` command
+
+```bash
+aws cloudformation describe-stacks --stack-name kastle-api
+```

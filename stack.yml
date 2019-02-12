@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'KASTLE API Gateway and Lambda function'
+
+Parameters:
+    KastleApiGatewayStageName:
+        Type: String
+        AllowedPattern: '^[a-z0-9]+$'
+        Default: 'test'
+    LambdaFunctionName:
+        Type: 'String'
+        AllowedPattern: '^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$'
+        Default: 'kastle-lambda-fun-user-api'
+
+Resources:
+    KastleApiGateway:
+        Type: 'AWS::ApiGateway::RestApi'
+        Properties:
+            Name: 'kastle-api'
+            Description: 'KASTLE API'
+
+    KastleApiGatewayRootMethod:
+        Type: 'AWS::ApiGateway::Method'
+        Properties:
+            AuthorizationType: 'NONE'
+            HttpMethod: 'ANY'
+            Integration:
+                IntegrationHttpMethod: 'POST'
+                Type: 'AWS_PROXY'
+                Uri: !Sub
+                    - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations'
+                    - LambdaArn: !GetAtt 'LambdaUserApi.Arn'
+            ResourceId: !GetAtt 'KastleApiGateway.RootResourceId'
+            RestApiId: !Ref KastleApiGateway
+
+    KastleApiGatewayDeployment:
+        Type: 'AWS::ApiGateway::Deployment'
+        DependsOn:
+            - KastleApiGatewayRootMethod
+        Properties:
+            RestApiId: !Ref 'KastleApiGateway'
+            StageName: !Ref KastleApiGatewayStageName
+
+    LambdaUserApi:
+        Type: 'AWS::Lambda::Function'
+        Properties:
+            Code:
+                S3Bucket: kastle-lambda-functions
+                S3Key: users-api.zip
+            Description: 'KASTLE user api handler function'
+            Handler: index.userApi
+            MemorySize: 128
+            Role: !GetAtt KastleLambdaIAMRole.Arn
+            Runtime: nodejs8.10
+            Timeout: 10
+
+    LambdaApiGatewayInvokePermission:
+        Type: 'AWS::Lambda::Permission'
+        Properties:
+            Action: 'lambda:InvokeFunction'
+            FunctionName: !GetAtt 'LambdaUserApi.Arn'
+            Principal: 'apigateway.amazonaws.com'
+            SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${KastleApiGateway}/*/POST/'
+
+    KastleLambdaIAMRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Action:
+                          - 'sts:AssumeRole'
+                      Effect: 'Allow'
+                      Principal:
+                          Service:
+                              - 'lambda.amazonaws.com'
+            Policies:
+                - PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Action:
+                                - 'logs:CreateLogGroup'
+                                - 'logs:CreateLogStream'
+                                - 'logs:PutLogEvents'
+                            Effect: 'Allow'
+                            Resource:
+                                - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionName}:*'
+                  PolicyName: 'CfPolicyLambdaLogging'
+
+    LambdaLogGroup:
+        Type: 'AWS::Logs::LogGroup'
+        Properties:
+            LogGroupName: !Sub '/aws/lambda/${LambdaFunctionName}'
+            RetentionInDays: 1
+
+Outputs:
+    KastleApiGatewayInvokeURL:
+        Value: !Sub 'https://${KastleApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${KastleApiGatewayStageName}'
+
+    LambdaArn:
+        Value: !GetAtt 'LambdaUserApi.Arn'
