@@ -1,0 +1,27 @@
+{
+    "name": "titanic-sheep",
+    "version": "1.0.0",
+    "description": "He-man",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "kastle",
+        "node",
+        "typescript",
+        "lambda"
+    ],
+    "author": "g-six",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^11.9.0",
+        "nodemon": "^1.18.10",
+        "prettier": "^1.16.4",
+        "pretty-quick": "^1.10.0",
+        "ts-node": "^8.0.2",
+        "tsconfig-paths": "^3.8.0",
+        "typescript": "^3.3.3"
+    }
+}
