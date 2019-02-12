@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy User API to Lambda
+
+Resources:
+    S3APIBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            AccessControl: Private
+            BucketName: kastle-lambda-functions
+
+Outputs:
+    S3APIBucket:
+        Description: S3 bucket containing our lambda code
+        Value: !GetAtt 'S3APIBucket.DomainName'
+        Export:
+            Name: 'S3APIBucket'
