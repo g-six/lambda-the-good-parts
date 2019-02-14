@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 bucket for all our lambda functions
+Resources:
+    MyS3LambdaBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            AccessControl: Private
+            BucketName: cloudformation-the-good-parts
+Outputs:
+    MyS3LambdaBucket:
+        Description: S3 bucket containing our lambda code
+        Value: !GetAtt 'MyS3LambdaBucket.DomainName'
+        Export:
+            Name: 'MyS3LambdaBucket'

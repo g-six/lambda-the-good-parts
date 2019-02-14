@@ -18,7 +18,11 @@ npm i
 
 ## 2. START
 
--   edit index.ts
+### Spin up your environment
+
+#### Let's create our first CloudFormation template that provision the following AWS resources:
+
+1. RDS Database
 
 ## 3. Deploy to AWS Lambda
 

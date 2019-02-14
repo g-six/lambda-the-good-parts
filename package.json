@@ -5,10 +5,15 @@
     "main": "index.js",
     "scripts": {
         "commit": "npx git-cz",
+        "build:zip": "tsc && npm run zippit",
         "dev": "nodemon",
         "test": "echo \"Error: no test specified\" && exit 1",
         "precommit": "lint-staged",
-        "zip:lambda": "rimraf ./$MODULE-api.zip && rimraf ./dist && tsc && zip -jr ./dist/$MODULE-api ./dist/$MODULE/"
+        "remove:module": "npm run remove:zipfile && npm run remove:compiled",
+        "remove:compiled": "rimraf ./dist/$MODULE",
+        "remove:zipfile": "rimraf ./dist/$MODULE-api.zip",
+        "zippit": "zip -jr ./dist/$MODULE-api ./dist/$MODULE/",
+        "zip:lambda": "npm run remove:module && npm run build:zip"
     },
     "keywords": [
         "kastle",
